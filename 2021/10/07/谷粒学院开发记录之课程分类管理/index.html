@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>
+        Hexo
+    </title>
+    
+<link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-reply replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            谷粒学院开发记录之课程分类管理
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h4 id="数据表结构"><a href="#数据表结构" class="headerlink" title="数据表结构"></a>数据表结构</h4><p><img src="https://gitee.com/SlowSail/blogIMg/raw/master//img/image-20211010090523667.png" alt="image-20211010090523667"></p>
+<h4 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h4><p>需要根据课程的id，获取各个章节的Video数据。</p>
+<p>因此，实际上还是希望返回树形的list结构。</p>
+<h4 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h4><p>首先看看数据库的对应关系，一个课程对应多个章节。一个章节有多个视频。</p>
+<p>返回的数据类型应该是章节的列表，同时章节里面的有一个子属性，是视频列表。</p>
+<p>即应该将章节对应的数据类型定义为：</p>
+<p>遇到的疑问：</p>
+<p>mybatis_plus生成文件的类型和结构都是什么？为什么</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">QueryWrapper&lt;EduChapter&gt; wrapperChapter=<span class="keyword">new</span> QueryWrapper&lt;&gt;();</span><br><span class="line">       wrapperChapter.eq(<span class="string">&quot;course_id&quot;</span>,courseID);</span><br><span class="line">       List&lt;EduChapter&gt; eduChapters = baseMapper.selectList(wrapperChapter);</span><br><span class="line"></span><br><span class="line">       QueryWrapper&lt;EduVideo&gt; wrapperVideo=<span class="keyword">new</span> QueryWrapper&lt;&gt;();</span><br><span class="line">       wrapperChapter.eq(<span class="string">&quot;course_id&quot;</span>,courseID);</span><br><span class="line">       List&lt;EduVideo&gt; list = videoService.list(wrapperVideo);</span><br></pre></td></tr></table></figure>
+
+<p>一个是list，一个是selectList。</p>
+<h4 id="功能需求"><a href="#功能需求" class="headerlink" title="功能需求"></a>功能需求</h4><p>需要在前端页面里面实现一个页面回退的功能，比如说发布新课程已经到了创建课程大纲了，但是还发现需要更改一下课程的基本信息：</p>
+<p><img src="https://gitee.com/SlowSail/blogIMg/raw/master//img/image-20211010114942700.png" alt="image-20211010114942700"></p>
+<p>我们设计的思路是，填写课程的基本信息就是将信息存储在数据库中，然后如果到创建课程大纲的时候，那就是将数据库的数据进行回显。</p>
+<p>因此，后端要根据id查找课程的基本信息。</p>
+<p>数据库查询相关的信息：</p>
+<p><img src="https://gitee.com/SlowSail/blogIMg/raw/master//img/image-20211012195504955.png" alt="image-20211012195504955"></p>
+<p><img src="https://gitee.com/SlowSail/blogIMg/raw/master//img/image-20211010090523667.png"></p>
+<p>对于查询的结果，定义一个自定义类定义返回的结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p>Copyright © 2020 <a class="flink" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a>-<a class="flink" target="_blank" rel="noopener" href="https://github.com/sanjinhub/hexo-theme-geek">Geek</a>.
+        <label class="el-switch el-switch-green el-switch-sm" style="vertical-align: sub;">
+            <input type="checkbox" name="switch" id="update_style">
+            <span class="el-switch-style"></span>
+        </label>
+<!--         <script type="text/javascript">
+        var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+        document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+        </script> -->
+    </p>
+</div>
+<input type="hidden" id="web_style" value="white">
+<input type="hidden" id="valine_appid" value="CmCti21ooOOIzFOhEyFkFvR0-gzGzoHsz">
+<input type="hidden" id="valine_appKey" value="FqiyUqbg7McKN2eG0MCewupf">
+
+<script src="/libs/jquery.min.js"></script>
+
+
+<script src="/libs/highlight/highlight.pack.js"></script>
+
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+
+<script src="/js/js.js"></script>
+
+<style type="text/css">
+.v * {
+    color: #698fca;
+}
+
+.v .vlist .vcard .vhead .vsys {
+    color: #3a3e4a;
+}
+
+.v .vlist .vcard .vh .vmeta .vat {
+    color: #638fd5;
+}
+
+.v .vlist .vcard .vhead .vnick {
+    color: #6ba1ff;
+}
+
+.v a {
+    color: #8696b1;
+}
+
+.v .vlist .vcard .vhead .vnick:hover {
+    color: #669bfc;
+}
+</style>
+</body>
+
+</html>
