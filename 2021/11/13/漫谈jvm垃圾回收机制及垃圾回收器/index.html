@@ -1,0 +1,277 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>漫谈jvm垃圾回收机制及垃圾回收器 | slowsail'space</title><meta name="keywords" content="java  jvm"><meta name="author" content="slowsail"><meta name="copyright" content="slowsail"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Java语言的一个重要特点就是对内存的管理。 对于内存，有两个相依相存的概念，一个是内存溢出，一个是内存泄露。内存溢出即大名鼎鼎的OOM。指内存空间已经满了，无法继续分配空间，导致程序无法进行。而内存泄露本身则不一定导致程序的崩溃，它指的是已经分配的内存，在不再需要使用的时候，没有及时清理。一旦没有及时清理的内容多了，那么就可能造成OOM。 而Java对内存的管理特点，十分明显地体现在其垃圾回收机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="漫谈jvm垃圾回收机制及垃圾回收器">
+<meta property="og:url" content="https://slowsail.top/2021/11/13/%E6%BC%AB%E8%B0%88jvm%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E5%8F%8A%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/index.html">
+<meta property="og:site_name" content="slowsail&#39;space">
+<meta property="og:description" content="Java语言的一个重要特点就是对内存的管理。 对于内存，有两个相依相存的概念，一个是内存溢出，一个是内存泄露。内存溢出即大名鼎鼎的OOM。指内存空间已经满了，无法继续分配空间，导致程序无法进行。而内存泄露本身则不一定导致程序的崩溃，它指的是已经分配的内存，在不再需要使用的时候，没有及时清理。一旦没有及时清理的内容多了，那么就可能造成OOM。 而Java对内存的管理特点，十分明显地体现在其垃圾回收机">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/SlowSail/blogIMg/blob/master/img/8.png">
+<meta property="article:published_time" content="2021-11-13T12:00:41.000Z">
+<meta property="article:modified_time" content="2021-11-13T12:05:45.924Z">
+<meta property="article:author" content="slowsail">
+<meta property="article:tag" content="java  jvm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/SlowSail/blogIMg/blob/master/img/8.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://slowsail.top/2021/11/13/%E6%BC%AB%E8%B0%88jvm%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E5%8F%8A%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '漫谈jvm垃圾回收机制及垃圾回收器',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-11-13 20:05:45'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 存档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://gitee.com/SlowSail/blogIMg/blob/master/img/8.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">slowsail'space</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 存档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">漫谈jvm垃圾回收机制及垃圾回收器</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-11-13T12:00:41.000Z" title="发表于 2021-11-13 20:00:41">2021-11-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-11-13T12:05:45.924Z" title="更新于 2021-11-13 20:05:45">2021-11-13</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="漫谈jvm垃圾回收机制及垃圾回收器"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>Java语言的一个重要特点就是对内存的管理。</p>
+<p>对于内存，有两个相依相存的概念，一个是内存溢出，一个是内存泄露。内存溢出即大名鼎鼎的OOM。指内存空间已经满了，无法继续分配空间，导致程序无法进行。而内存泄露本身则不一定导致程序的崩溃，它指的是已经分配的内存，在不再需要使用的时候，没有及时清理。一旦没有及时清理的内容多了，那么就可能造成OOM。</p>
+<p>而Java对内存的管理特点，十分明显地体现在其垃圾回收机制中。这里的垃圾回收，就是上面说的已经不再需要但占据内存空间的程序对象。由于Java语言的使用场景的变迁，垃圾回收机制以及实现垃圾回收机制的垃圾回收器也有诸多的不同。</p>
+<h4 id="从Stop-the-world说起"><a href="#从Stop-the-world说起" class="headerlink" title="从Stop the world说起"></a>从Stop the world说起</h4><p>垃圾回收的一个经典概念是Stop The World，简称STW。在垃圾回收的时候，由于要对内存进行清理，如果这个时候程序还是自顾自运行，那么很可能出现问题。因此在进行垃圾回收的时候，正在运行的各个用户线程需要停止，只留下垃圾回收的线程做垃圾回收的工作。由于线程是程序世界的绝对主角，各个线程都停止了，也就相当于整个程序世界都静止了。</p>
+<p>不过，初学JVM的时候，我有一个疑问，CMS垃圾回收器也有STW吗？</p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/29114369">https://www.zhihu.com/question/29114369</a></p>
+<p>因为对于CMS垃圾回收器，有一个说法：它第一次实现了让垃圾收集线程与用户线程同时工作。不过，只需要搞清楚垃圾回收的本质，就能明白，至少在现在，STW无法避免。但是如果STW不可避免，那么CMS怎么和用户线程同时工作呢。</p>
+<p>这里就涉及一个概念，并发和并行。这里CMS垃圾回收器，应该被称为并发垃圾回收器。指的是垃圾回收这个过程，和用户线程是交替进行的。虽然CMS垃圾回收器，依然会在垃圾回收过程中STW，但是CMS垃圾回收的过程可以和用户线程交替进行，这就保证了CMS垃圾回收器的交互性强，响应速度快，而这一特点，正好满足了搭建网站的需求，因此，CMS垃圾回收器可谓生逢其时。</p>
+<p>那么，CMS到底是怎么降低垃圾回收STW的时长的呢？</p>
+<p>这与CMS的垃圾回收算法有关系。</p>
+<p>垃圾回收算法总体思路非常近似。首先，当然是要把“垃圾”给找出来，找到垃圾之后，还要给垃圾做一个标记。这个步骤，叫做垃圾标记。除了垃圾之外，就是以后还要用的对象。因此，也可以考虑找到存活的对象，将存活的对象留下来。</p>
+<p>这种找存活的对象，有两个经典的思路。一个是引用计数的方法，另外一个是可达性分析的方法。引用计数的方法，其实有点像搜索引擎的排名方法，利用指向对象的链接数来判断引用是否存活。但是引用计数法难以解决循环引用的问题，即两个对象相互指向。因此，JVM采用可达性分析的方法来进行垃圾标记。可达性分析的方法，是认为在程序运行的过程中，一定有一些对象是存在的。比如：</p>
+<ul>
+<li>虚拟机栈中引用的对象</li>
+<li>方法栈内引用的对象</li>
+<li>方法区中类静态属性引用的对象</li>
+<li>字符串常量池里的引用</li>
+<li>被同步锁持有的对象</li>
+<li>java虚拟机内部的引用</li>
+</ul>
+<p>可达性分析算法中，找这种一定存在的对象的过程，一定要在一个能保障一致性的快照中进行，这也是GC必须进行STW的原因。</p>
+<p>对于CMS垃圾回收器而言，STW仅仅发生在初始标记阶段，在该阶段，垃圾回收器标记出GCRoots能直接关联到的对象。一旦标记完成后会恢复之前被暂停的所有应用线程。</p>
+<p>在应用线程继续进行的时候，CMS进行并发标记的工作，即完成其他被GCRoots关联的对象的标记。</p>
+<p>但是，在应用进程继续进行的时候，可能由于这段时间的程序运行，导致标记发生一部分变动，因此，需要再次STW来标出这部分发生变动的内容。</p>
+<p>将所有垃圾标记完毕后，就应该进入并发清除阶段，即清理删除掉标记阶段判断已经死亡的对象。由于清除的都是垃圾，因此清除阶段应用程序可以继续进行。</p>
+<p>CMS垃圾收集器之所以这样著名，就在于其很好地降低了STW时间。但是在另外一些场景中，可能STW时长并非是最重要的指标，这个时候，就要考虑其他的垃圾回收算法了。</p>
+<h4 id="标记了，然后呢？"><a href="#标记了，然后呢？" class="headerlink" title="标记了，然后呢？"></a>标记了，然后呢？</h4><p>对于垃圾内容的标记，是任何一种垃圾回收器都会做的事情。但是垃圾回收器做完标记之后的行为，却各有不同。像CMS垃圾回收器，其最主要的工作其实就是做标记。做完标记之后，无非是下回再需要内存的时候，将标记的垃圾区域直接当空闲区域使用，但是这样的做法也有问题：由于垃圾本身是与程序有关的，所以垃圾在内存中的分布往往不是连续的，因此仅仅对垃圾做标记，就会内存碎片的问题：可用的空闲区域被存活对象分割成一片片，虽然可用队列的方式标记空闲区域的地址，但是如果后面需要存入较大的对象，可能就无法找到合适的内存空间。</p>
+<p>因此，可以考虑在垃圾回收的过程中，对存活的对象进行一定的处理，比如将所有存活对象压缩到内存的一端，按顺序存放。之后存活对象外的空间。这种方法被称作标记压缩。标记压缩的方法解决了内存碎片的问题，不仅避免了无法存放较大对象的问题，而且在分配内存的时候，可以用指针碰撞的方法分配内存，即只需要修改指针的偏移量将新对象分配到一个空闲内存位置上。</p>
+<p>不过，要移动存活对象，这个开销看起来就不小。因此，我们又可以考虑另外一种算法，即复制算法。复制算法将内存分为两个区域，将正在使用区域的存活对象复制到另外一个区域，之后清除正在使用的内存的所有对象，再交换两个内存的角色。</p>
+<p>这个算法的缺点显而易见，就是消耗空间。但是优点也很明显，就是不会产生内存碎片，也不需要整理（其实是做了整理这个事情，不过是该算法利用冗余的空间，将整理和标记的事情放在一起做了）。</p>
+<p>不同的垃圾回收算法，有其各自的特点。由此也产生了对应不同垃圾回收算法的垃圾回收器。</p>
+<h4 id="垃圾回收器"><a href="#垃圾回收器" class="headerlink" title="垃圾回收器"></a>垃圾回收器</h4><p>垃圾回收器不少，比如CMS垃圾回收器，G1垃圾回收器。还有Serial以及Serial Old垃圾回收器，ParNew,Parallel Scavenge，Parallel old垃圾回收器。</p>
+<p>对不同的垃圾回收器，我们可以从不同方面做一些简单的分类。</p>
+<p>首先是从垃圾回收这个过程本身的线程数来分类，将垃圾回收器分为串行垃圾回收器和并行垃圾回收器。这里的串行和并行都是针对垃圾回收这个过程来讲的。串行垃圾回收器利用一个线程来进行垃圾回收，而并行垃圾回收器则用多个线程来进行垃圾回收。想到串行垃圾回收器，就可以想到Serial垃圾回收器和Serial Old垃圾回收器。而其他的垃圾回收器都是并行的。</p>
+<p>其中，比较有趣的是Paraller 垃圾回收器，它和ParNew垃圾回收器一样，都是并行垃圾回收器，不过它是一款吞吐量优先的垃圾回收器。</p>
+<p>这就涉及到垃圾回收器的评价指标问题。以现在一般网站服务的情况来说，我们希望STW的时间尽可能短，对用户线程影响尽可能小。但是，一味追求STW的短，可能导致STW的次数变多，即使得一段时间内，用户线程真正运行的时间减小。因此，又提出了另外一个指标吞吐量来评价垃圾回收器。吞吐量指的是用户线程运行时间/总的时间（用户线程运行时间+垃圾回收器垃圾回收的时间）。而Paraller垃圾回收器就是吞吐量优先的垃圾回收器，因为其吞吐量优先，因此很适合用来做那些弱交互性的程序，比如作为后台应用进行科学计算等。</p>
+<p>另外一个垃圾回收器的分类标准是是垃圾回收是否是独占的，即垃圾回收这个线程是否能够被应用程序打断。如果垃圾回收这个线程不会被应用程序打断，那么垃圾回收就是独占的，否则就可以实现垃圾回收的时候，应用程序同时也可以运行的效果（广义范围的，中间是垃圾回收线程和应用程序线程之间的相互切换）。</p>
+<p>不同的垃圾回收器作用的处理年代也有所不同。而不同的处理年代，也决定了垃圾回收算法。对于新生代垃圾回收器来说，常常采用复制算法，因为新生代的存活对象相对较少，需要回收的垃圾较多，所以要着重考虑内存碎片的问题，因此新生代垃圾回收常用复制算法。老年代的垃圾回收算法则用标记-压缩，这也与老年代存活对象较多的特征有关。</p>
+<p>G1垃圾回收器又和以往的垃圾回收器不同。G1回收器出现在堆空间变得更加大的现在，所以G1回收器采取的垃圾回收算法也利用了堆空间较大的特点。</p>
+<p>下面是各种垃圾回收器的一个对比：</p>
+<table>
+<thead>
+<tr>
+<th>垃圾回收器</th>
+<th>处理年代</th>
+<th>并行/串行</th>
+<th>并发/独占</th>
+<th>垃圾回收算法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Serial</td>
+<td>Young</td>
+<td>串行</td>
+<td>独占</td>
+<td>复制算法</td>
+</tr>
+<tr>
+<td>Serial Old</td>
+<td>Old</td>
+<td>串行</td>
+<td>独占</td>
+<td>标记-压缩</td>
+</tr>
+<tr>
+<td>ParNew</td>
+<td>Young</td>
+<td>并行</td>
+<td>独占</td>
+<td>复制算法</td>
+</tr>
+<tr>
+<td>Parallel</td>
+<td>Young</td>
+<td>并行</td>
+<td>独占</td>
+<td>复制算法（吞吐量优先）</td>
+</tr>
+<tr>
+<td>Parallel Old</td>
+<td>Old</td>
+<td>并行</td>
+<td>独占</td>
+<td>标记压缩算法</td>
+</tr>
+<tr>
+<td>G1</td>
+<td>Young and Old</td>
+<td>并行</td>
+<td>并发</td>
+<td>垃圾优先回收，分区域复制算法，整体标记压缩</td>
+</tr>
+<tr>
+<td>CMS</td>
+<td>Young</td>
+<td>并行</td>
+<td>并发</td>
+<td>标记-清除算法</td>
+</tr>
+</tbody></table>
+<h4 id="G1垃圾回收器"><a href="#G1垃圾回收器" class="headerlink" title="G1垃圾回收器"></a>G1垃圾回收器</h4><p>G1垃圾回收器可谓非常现代的垃圾回收器，充分适应了当前大内存，多处理器的环境。G1垃圾回收器的命名意义为Garbage First即垃圾优先，其含义指的是它有计划地避免在整个Java堆中进行全区域的垃圾收集，而是将Java堆划分为多个Region，跟踪每个Region里面垃圾堆积的价值大小，在后台维护一个优先列表，每次根据允许的收集时间，优先回收价值最大的Region。不过，从分代的角度来看，G1仍然会区分年轻代和老年代，只不过其不要求Eden区年轻代老年代都是连续 且固定大小的，其处理的范围，也兼顾了年轻代和老年代。</p>
+<p>G1垃圾回收器会将整个堆划分成约2048个大小相同的独立Region，每个Region都有可能属于Eden，Survivor或者Old/Tenured内存区域。但是一个region只可能属于一个角色。相对于CMS垃圾回收器，G1垃圾回收器有一个概念上的改变，就是其 <strong>设计导向变为追求能够应付应用的内存分配速率，而不追求一次把整个java堆清理干净</strong>（深入理解java虚拟机第三版所总结）。</p>
+<p>G1垃圾回收器同样进行了需要暂停用户进程的初始标记，以及与用户进程同步进行的并发标记，还有最后对在并发过程中改变的对象的最终标记。不过，与CMS的并发清除不同的是，G1垃圾回收器最后一步做的是筛选回收。</p>
+<p>筛选回收做了如下事情：</p>
+<p>1.对region的统计数据进行更新，同时对region垃圾回收价值进行排序，制定回收计划。</p>
+<p>2.自由选择多个region构成回收集。</p>
+<p>3.把决定回收的region的存活对象复制到空的region，清理掉旧region空间。</p>
+<p>筛选回收不同于CMS的并发清除，是会暂停用户线程的，这也是后续的垃圾回收器进一步优化的点；此外，由于G1 最后利用复制的方法，移动了存活对象，所以避免了CMS的内存碎片问题。</p>
+<p>G1垃圾回收器，的总体策略，在复制算法和整理算法中间做了个权衡。即全局来看，是整理算法，而局部来看，则是复制算法。这样规避了复制算法带来的过大的空间浪费，同时也避免了整理算法所消耗的时间。不过，这不意味着G1 垃圾回收器就比CMS更先进更高级了。因为G1的一些设计，比如分为多个region，其中跨region的引用，需要用记忆集来进行处理。但是记忆集实现复杂，比此前的垃圾回收器需要更多的内存占用。</p>
+<h4 id="回顾"><a href="#回顾" class="headerlink" title="回顾"></a>回顾</h4><p>不同的垃圾回收器，有其不同的特性。虽然垃圾回收技术都是逐渐发展螺旋上升，后面还出现了一些低延迟垃圾回收器，其垃圾回收过程几乎可以全部和用户同步（对应G1垃圾回收器的筛选回收过程都实现了同步），但我们仍然要根据具体的情况选择垃圾回收器。</p>
+<p>其中，垃圾回收器的思想，也值得我们学习。</p>
+<p>从开始简单的标记-清理，标记-复制，标记-整理，再到后面试图将标记过程分为初始标记和并行标记，再到回收价值最高的region；从开始的单线程回收，到多线程回收，从垃圾回收线程要完整的走完一遍STW，到现在越来越短的延迟时间，垃圾回收器技术的发展过程，也是一种不断进行权衡的过程。如何利用资源，如何改进技术，如何设定指标和完成指标，都是我们应该学习的，应该思考的。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">slowsail</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://slowsail.top/2021/11/13/%E6%BC%AB%E8%B0%88jvm%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E5%8F%8A%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/">https://slowsail.top/2021/11/13/%E6%BC%AB%E8%B0%88jvm%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E5%8F%8A%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://slowsail.top" target="_blank">slowsail'space</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/java-jvm/">java  jvm</a></div><div class="post_share"><div class="social-share" data-image="https://gitee.com/SlowSail/blogIMg/blob/master/img/8.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2021/11/04/ArrayList%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3/"><img class="next-cover" src="https://i.pximg.net/img-original/img/2021/06/10/23/49/30/90465462_p0.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ArrayList源码详解</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">slowsail</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/SlowSailKnowNothing" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1067235713@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8EStop-the-world%E8%AF%B4%E8%B5%B7"><span class="toc-number">1.</span> <span class="toc-text">从Stop the world说起</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%87%E8%AE%B0%E4%BA%86%EF%BC%8C%E7%84%B6%E5%90%8E%E5%91%A2%EF%BC%9F"><span class="toc-number">2.</span> <span class="toc-text">标记了，然后呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8"><span class="toc-number">3.</span> <span class="toc-text">垃圾回收器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#G1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8"><span class="toc-number">4.</span> <span class="toc-text">G1垃圾回收器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9E%E9%A1%BE"><span class="toc-number">5.</span> <span class="toc-text">回顾</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/11/13/%E6%BC%AB%E8%B0%88jvm%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E5%8F%8A%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/" title="漫谈jvm垃圾回收机制及垃圾回收器"><img src="https://gitee.com/SlowSail/blogIMg/blob/master/img/8.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="漫谈jvm垃圾回收机制及垃圾回收器"/></a><div class="content"><a class="title" href="/2021/11/13/%E6%BC%AB%E8%B0%88jvm%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E5%8F%8A%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/" title="漫谈jvm垃圾回收机制及垃圾回收器">漫谈jvm垃圾回收机制及垃圾回收器</a><time datetime="2021-11-13T12:00:41.000Z" title="发表于 2021-11-13 20:00:41">2021-11-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/11/04/ArrayList%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3/" title="ArrayList源码详解"><img src="https://i.pximg.net/img-original/img/2021/06/10/23/49/30/90465462_p0.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ArrayList源码详解"/></a><div class="content"><a class="title" href="/2021/11/04/ArrayList%E6%BA%90%E7%A0%81%E8%AF%A6%E8%A7%A3/" title="ArrayList源码详解">ArrayList源码详解</a><time datetime="2021-11-04T13:16:29.000Z" title="发表于 2021-11-04 21:16:29">2021-11-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/10/28/HashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" title="HashMap源码解析"><img src="https://i.pximg.net/img-original/img/2021/06/10/23/49/30/90465462_p0.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="HashMap源码解析"/></a><div class="content"><a class="title" href="/2021/10/28/HashMap%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" title="HashMap源码解析">HashMap源码解析</a><time datetime="2021-10-28T00:09:39.000Z" title="发表于 2021-10-28 08:09:39">2021-10-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/10/06/%E5%9C%A8%E7%BA%BF%E8%BF%90%E8%A1%8Cjava%E7%A8%8B%E5%BA%8F%E7%BD%91%E7%AB%99%E7%9A%84%E8%AE%BE%E8%AE%A1/" title="在线运行java程序网站的设计"><img src="https://www.pixiv.net/artworks/88099220" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="在线运行java程序网站的设计"/></a><div class="content"><a class="title" href="/2021/10/06/%E5%9C%A8%E7%BA%BF%E8%BF%90%E8%A1%8Cjava%E7%A8%8B%E5%BA%8F%E7%BD%91%E7%AB%99%E7%9A%84%E8%AE%BE%E8%AE%A1/" title="在线运行java程序网站的设计">在线运行java程序网站的设计</a><time datetime="2021-10-06T00:37:37.000Z" title="发表于 2021-10-06 08:37:37">2021-10-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/09/22/leetcode%E9%A2%98%E7%9B%AE%E6%80%BB%E7%BB%93/" title="leetcode题目总结"><img src="https://www.pixiv.net/artworks/92917351" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="leetcode题目总结"/></a><div class="content"><a class="title" href="/2021/09/22/leetcode%E9%A2%98%E7%9B%AE%E6%80%BB%E7%BB%93/" title="leetcode题目总结">leetcode题目总结</a><time datetime="2021-09-22T12:36:22.000Z" title="发表于 2021-09-22 20:36:22">2021-09-22</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By slowsail</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
