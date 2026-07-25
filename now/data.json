@@ -1,0 +1,55 @@
+{
+  "updatedAt": "2026-07-25",
+  "statement": "珍惜时间，用理性思考保持做事情的正确性。",
+  "mission": "探索人和无限智能的协作方式，并维护人类尊严。",
+  "vision": "创作出有价值的内容和作品，并收获与之对应的酬劳。",
+  "focus": [
+    "构建自己的 Personal Harness 体系，并把真实实践整理成教程。",
+    "持续写作，让重要的感受和思考逐渐成为完整作品。",
+    "构建自己的信息流和选题体系，让知识稳定流向创作。"
+  ],
+  "principles": [
+    "珍惜时间",
+    "三思后行",
+    "耐心",
+    "健康优先",
+    "专注",
+    "保持开放"
+  ],
+  "habitDefinitions": [
+    {
+      "id": "sleepEarly",
+      "label": "22:30 前上床"
+    },
+    {
+      "id": "noPhoneBeforeBed",
+      "label": "睡前不刷手机"
+    },
+    {
+      "id": "screenTimeControlled",
+      "label": "手机使用低于目标"
+    },
+    {
+      "id": "reading",
+      "label": "阅读 15 分钟"
+    },
+    {
+      "id": "exercise",
+      "label": "完成运动计划"
+    },
+    {
+      "id": "deepWork",
+      "label": "深度专注 2 小时"
+    },
+    {
+      "id": "topOne",
+      "label": "推进当天 Top 1"
+    },
+    {
+      "id": "review",
+      "label": "完成夜间复盘"
+    }
+  ],
+  "screenTimeGoalMinutes": 150,
+  "records": []
+}
