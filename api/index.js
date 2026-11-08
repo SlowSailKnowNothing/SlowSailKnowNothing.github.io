@@ -1,3 +1,4 @@
+import {requestRoute} from '../lib/request-route.js';
 import {readFile} from 'node:fs/promises';
 import {config,session,sameOrigin,login,callback,cookie,SESSION_COOKIE,STATE_COOKIE} from '../lib/auth.js';
 import {githubStore,storeConfig,MAX_BYTES} from '../lib/github-store.js';
@@ -14,8 +15,7 @@ export function createHandler({env=process.env,fetcher=fetch}={}){
   const redirect=(url)=>{res.statusCode=302;res.setHeader('Location',url);res.end();};
   let cfg;
   try{
-   const url=new URL(req.url,'https://local.invalid');let route=url.pathname.replace(/^\/(?:api\/)?/,'');if(route==='index'&&url.searchParams.has('route')){route=url.searchParams.get('route');url.searchParams.delete('route');url.pathname='/'+(route.startsWith('data/')?route:'api/'+route);}
-   if(route==='admin/')route='admin';
+   const {url,route}=requestRoute(req);
    const allowedMethods={'reading/cards':['GET'],'data/today.json':['GET'],'data/reading.json':['GET'],'public/content':['GET'],'auth/login':['GET'],'auth/callback':['GET'],'auth/session':['GET'],'auth/logout':['POST'],'admin':['GET'],'admin/content':['GET','PUT'],'admin/history':['GET'],'admin/rollback':['POST']}[route];
    if(!allowedMethods)return send(404,{error:'route_not_found'});
    if(!allowedMethods.includes(req.method)){res.setHeader('Allow',allowedMethods.join(', '));return send(405,{error:'method_not_allowed'});}
@@ -47,7 +47,7 @@ export function createHandler({env=process.env,fetcher=fetch}={}){
     const value=route==='admin/content'?await store.write(body.data,body.expectedVersion):await store.rollback(body.commit,body.expectedVersion);cacheGeneration++;publicCache=null;return send(200,value);
    }
    return send(404,{error:'route_not_found'});
-  }catch(error){const safe=new Set(['sign_in_required','oauth_invalid_state','oauth_failed','oauth_scope_mismatch','owner_only','storage_not_configured','version_conflict','content_not_found','storage_unavailable','invalid_stored_content','invalid_version','invalid_content','content_too_large','write_outcome_uncertain','invalid_history','invalid_commit','rollback_version_not_listed']);return send(error.status||(error.message==='owner_only'?403:error.message?.startsWith('oauth_')?400:503),{error:safe.has(error.message)?error.message:'service_unavailable'});}
+  }catch(error){const safe=new Set(['invalid_query','sign_in_required','oauth_invalid_state','oauth_failed','oauth_scope_mismatch','owner_only','storage_not_configured','version_conflict','content_not_found','storage_unavailable','invalid_stored_content','invalid_version','invalid_content','content_too_large','write_outcome_uncertain','invalid_history','invalid_commit','rollback_version_not_listed']);return send(error.status||(error.message==='owner_only'?403:error.message?.startsWith('oauth_')?400:503),{error:safe.has(error.message)?error.message:'service_unavailable'});}
  };
 }
 export default createHandler();

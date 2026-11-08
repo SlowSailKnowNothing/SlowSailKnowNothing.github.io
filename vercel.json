@@ -11,8 +11,40 @@
   },
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/index?route=:path*"
+      "source": "/api/reading/cards",
+      "destination": "/api/index?route=reading/cards"
+    },
+    {
+      "source": "/api/public/content",
+      "destination": "/api/index?route=public/content"
+    },
+    {
+      "source": "/api/auth/login",
+      "destination": "/api/index?route=auth/login"
+    },
+    {
+      "source": "/api/auth/callback",
+      "destination": "/api/index?route=auth/callback"
+    },
+    {
+      "source": "/api/auth/session",
+      "destination": "/api/index?route=auth/session"
+    },
+    {
+      "source": "/api/auth/logout",
+      "destination": "/api/index?route=auth/logout"
+    },
+    {
+      "source": "/api/admin/content",
+      "destination": "/api/index?route=admin/content"
+    },
+    {
+      "source": "/api/admin/history",
+      "destination": "/api/index?route=admin/history"
+    },
+    {
+      "source": "/api/admin/rollback",
+      "destination": "/api/index?route=admin/rollback"
     },
     {
       "source": "/data/today.json",
