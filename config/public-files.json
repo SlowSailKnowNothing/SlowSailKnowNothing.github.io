@@ -1,0 +1,29 @@
+{
+  "public": [
+    "assets/admin.css",
+    "assets/admin.js",
+    "assets/app.js",
+    "assets/favicon.svg",
+    "assets/fonts/LXGWWenKai-Regular.woff2",
+    "assets/fonts/OFL.txt",
+    "assets/model.js",
+    "assets/public-reading.css",
+    "assets/reading-cards.css",
+    "assets/reading-deck-model.js",
+    "assets/reading-deck.js",
+    "assets/reading-fragments/cards-paper-plane.webp",
+    "assets/reading-fragments/reading-lamp.webp",
+    "assets/reading-fragments/thought-sprout.webp",
+    "assets/reading-graph.css",
+    "assets/reading-graph.js",
+    "assets/reading-home.js",
+    "assets/reading-model.js",
+    "assets/reading.js",
+    "assets/style.css",
+    "index.html",
+    "reading/index.html"
+  ],
+  "serverOnly": [
+    "admin/index.html"
+  ]
+}

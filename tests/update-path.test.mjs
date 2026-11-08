@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {shouldSkipBuild} from '../scripts/ignore-build.mjs';
+test('content-only updates refresh from GitHub without a code redeploy',()=>{assert.equal(shouldSkipBuild(['content/public-site.json']),true);for(const files of [[],['api/index.js'],['content/reading-library.json'],['content/public-site.json','api/index.js']])assert.equal(shouldSkipBuild(files),false);});

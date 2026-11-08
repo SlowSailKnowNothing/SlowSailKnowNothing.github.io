@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+migration-public
+.github
+node_modules
+docs/existing-site-export.patch
+docs/MIGRATION_BLOCKERS.md
+docs/migration-plan.json
+docs/public-export-manifest.json

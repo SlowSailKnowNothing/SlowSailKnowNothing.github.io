@@ -1,0 +1,29 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createHandler} from '../api/index.js';
+import {sign,SESSION_COOKIE} from '../lib/auth.js';
+const env={APP_ORIGIN:'https://example.com',GITHUB_OWNER_ID:'123',GITHUB_CLIENT_ID:'client',GITHUB_CLIENT_SECRET:'test-secret',SESSION_SECRET:'x'.repeat(64),GITHUB_CONTENT_REPO:'owner/site',GITHUB_CONTENT_BRANCH:'main',GITHUB_CONTENT_TOKEN:'test-token'};
+const cookie=`${SESSION_COOKIE}=${sign({kind:'session',id:'123',exp:Date.now()+600000},env.SESSION_SECRET)}`;
+async function run(url,method='GET',headers={},body,patch={}){let calls=0;const res={headers:{},setHeader(k,v){this.headers[k.toLowerCase()]=v;},end(value){this.body=value;}};await createHandler({env:{...env,...patch},fetcher:async()=>{calls++;throw new Error('unwanted-network');}})({url,method,headers,body},res);return {...res,calls};}
+test('anonymous writes blocked regardless of forged Sites identity',async()=>{const res=await run('/api/admin/content','PUT',{'oai-authenticated-user-id':'123','oai-authenticated-user-email':'owner',origin:env.APP_ORIGIN});assert.equal(res.statusCode,401);assert.equal(res.calls,0);});
+test('owner writes reject cross-origin absent origin and missing review',async()=>{for(const origin of [undefined,'https://evil.test']){const res=await run('/api/admin/content','PUT',{cookie,origin,'content-type':'application/json'},{publicReviewConfirmed:true});assert.equal(res.statusCode,403);assert.equal(res.calls,0);}const noReview=await run('/api/admin/content','PUT',{cookie,origin:env.APP_ORIGIN,'content-type':'application/json'},{});assert.equal(noReview.statusCode,400);assert.equal(noReview.calls,0);});
+test('logout invalidates browser cookie and requires same origin',async()=>{const res=await run('/api/auth/logout','POST',{cookie,origin:env.APP_ORIGIN});assert.equal(res.statusCode,200);assert.match(res.headers['set-cookie'],/Max-Age=0/);});
+test('missing configuration fails closed and does not expose secrets',async()=>{const res=await run('/api/admin/content','GET',{cookie},undefined,{SESSION_SECRET:''});assert.equal(res.statusCode,503);assert.deepEqual(JSON.parse(res.body),{error:'service_unavailable'});assert.equal(res.calls,0);});
+test('admin HTML endpoint redirects anonymous viewers instead of serving app',async()=>{const res=await run('/api/index?route=admin');assert.equal(res.statusCode,302);assert.equal(res.headers.location,'https://example.com/api/auth/login');assert.equal(res.calls,0);});
+test('sessions support Vercel route rewriting',async()=>{const res=await run('/api/index?route=auth/session','GET',{cookie});assert.equal(res.statusCode,200);assert.deepEqual(JSON.parse(res.body),{authenticated:true});});
+
+test('known endpoints enforce HTTP methods without upstream work',async()=>{for(const [url,method,allow]of [['/api/public/content','POST','GET'],['/data/today.json','PUT','GET'],['/api/admin/rollback','GET','POST'],['/api/admin/content','DELETE','GET, PUT'],['/api/auth/logout','GET','POST'],['/api/auth/login','POST','GET'],['/admin','PUT','GET']]){const res=await run(url,method,{cookie,origin:env.APP_ORIGIN});assert.equal(res.statusCode,405,url);assert.equal(res.headers.allow,allow);assert.equal(res.calls,0);}});
+test('owner receives gated HTML without caching; anonymous direct aliases never do',async()=>{const res=await run('/api/index?route=admin','GET',{cookie});assert.equal(res.statusCode,200);assert.match(res.headers['content-type'],/text\/html/);assert.match(res.body,/<html/);assert.equal(res.headers['cache-control'],'no-store');assert.match(res.headers['content-security-policy'],/frame-ancestors 'none'/);for(const path of ['/admin','/admin/','/api/admin']){const blocked=await run(path);assert.equal(blocked.statusCode,302,path);assert.ok(!blocked.body);}});
+test('successful owner publication invalidates shared public cache; errors are never cached',async()=>{
+ const {readFile}=await import('node:fs/promises');let current=JSON.parse(await readFile(new URL('../content/public-site.json',import.meta.url),'utf8'));let sha='a'.repeat(40),reads=0,writes=0,fail=false;
+ const handler=createHandler({env,fetcher:async(url,options)=>{
+  if(fail)return {ok:false,status:500};
+  if(options.method==='PUT'){writes++;const input=JSON.parse(options.body);assert.equal(input.sha,sha);current=JSON.parse(Buffer.from(input.content,'base64'));sha='b'.repeat(40);return {ok:true,json:async()=>({content:{sha},commit:{sha:'c'.repeat(40)}})};}
+  reads++;return {ok:true,json:async()=>({type:'file',encoding:'base64',size:Buffer.byteLength(JSON.stringify(current)),content:Buffer.from(JSON.stringify(current)).toString('base64'),sha})};
+ }});
+ async function call(url,method='GET',body){const res={headers:{},setHeader(k,v){this.headers[k.toLowerCase()]=v;},end(v){this.body=v;}};await handler({url,method,body,headers:{cookie,origin:env.APP_ORIGIN,'content-type':'application/json'}},res);return res;}
+ assert.equal((await call('/api/public/content')).statusCode,200);assert.equal((await call('/data/today.json')).statusCode,200);assert.equal(reads,1);
+ const data=structuredClone(current);data.today.sections.thoughts.paragraphs=['公开内容更新测试'];const result=await call('/api/admin/content','PUT',{data,expectedVersion:sha,publicReviewConfirmed:true});assert.equal(result.statusCode,200);assert.equal(writes,1);assert.equal(reads,2);
+ const publicResult=await call('/api/public/content');assert.equal(reads,3);assert.equal(JSON.parse(publicResult.body).data.today.sections.thoughts.paragraphs[0],'公开内容更新测试');assert.ok(!publicResult.body.includes(env.GITHUB_CONTENT_TOKEN));
+ const badHandler=createHandler({env,fetcher:async()=>({ok:false,status:500})});const response={headers:{},setHeader(k,v){this.headers[k.toLowerCase()]=v;},end(v){this.body=v;}};await badHandler({url:'/api/public/content',method:'GET',headers:{}},response);assert.equal(response.statusCode,503);assert.equal(response.headers['cache-control'],'no-store');
+});

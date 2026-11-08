@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fcfbfd">
+  <meta name="description" content="个人近况，慢慢记录。">
+  <meta name="robots" content="noindex, nofollow">
+  <title>个人近况 · 今日</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/style.css">
+  <script type="module" src="./assets/app.js"></script>
+  <script type="module" src="./assets/reading-home.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <div class="page">
+    <header class="site-header"><a href="./" class="site-name" aria-label="个人近况首页">个人近况</a><a class="access-note" href="/admin">管理</a></header>
+    <main id="main">
+      <div class="page-heading"><h1>今日</h1><p class="page-meta" id="page-meta">等待第一条记录</p></div>
+      <div id="sections" class="sections" aria-label="近况正文"></div>
+      <section id="reading-home" class="reading-home" aria-label="阅读碎片"><p>本周阅读与收听：待同步。</p><a href="/reading?open=first" data-reading-entry>随便读读</a></section>
+      <section class="habits" aria-labelledby="habits-heading">
+        <div class="section-heading"><h2 id="habits-heading">习惯</h2><span id="record-count" class="quiet">待记录</span></div>
+        <div class="habit-tabs" role="tablist" aria-label="选择习惯">
+          <button type="button" role="tab" id="tab-exercise" aria-controls="habit-panel" aria-selected="true" data-metric="exercise" tabindex="0">运动</button>
+          <button type="button" role="tab" id="tab-reading" aria-controls="habit-panel" aria-selected="false" data-metric="reading" tabindex="-1">阅读</button>
+          <button type="button" role="tab" id="tab-review" aria-controls="habit-panel" aria-selected="false" data-metric="review" tabindex="-1">复盘</button>
+        </div>
+        <div id="habit-panel" role="tabpanel" aria-labelledby="tab-exercise">
+          <div class="heatmap-intro"><p id="metric-description"></p><span id="date-range"></span></div>
+          <div class="heatmap-layout">
+            <div class="calendar" aria-label="最近十二周习惯记录">
+              <div id="months" class="months" aria-hidden="true"></div>
+              <div class="calendar-body"><div class="weekdays" aria-hidden="true"><span>一</span><span></span><span>三</span><span></span><span>五</span><span></span><span>日</span></div><div id="heatmap" role="group" aria-label="每天的记录，可用方向键浏览"></div></div>
+            </div>
+            <div id="legend" class="legend" aria-label="颜色说明"></div>
+          </div>
+          <p id="day-detail" class="day-detail" role="status" aria-live="polite">选择一天，查看记录。</p>
+          <p class="data-note">空白表示未记录，不代表没有做。只显示已确认的记录。</p>
+        </div>
+      </section>
+      <section class="archive" id="archive" aria-labelledby="archive-heading" hidden><h2 id="archive-heading">过往近况</h2><p class="empty" id="archive-empty">还没有历史记录。第一篇近况会从这里开始。</p><ol id="archive-list"></ol></section>
+      <noscript><p>需要启用 JavaScript 才能读取近况和切换习惯。当前还没有已确认的记录。</p></noscript>
+      <p id="error" role="alert" hidden>记录暂时未能载入，请刷新再试。没有把载入失败当成零值。</p>
+    </main>
+    <footer class="site-footer"><button id="archive-toggle" aria-expanded="false" aria-controls="archive">过往近况</button><span title="还没有文章">文章 · 待整理</span><a href="/reading?open=first" data-reading-entry>随便读读</a><button id="about-open">关于</button></footer>
+  </div>
+  <dialog id="about"><div class="dialog-header"><h2>关于此页</h2><button id="about-close" aria-label="关闭关于">×</button></div><p>一页安静的个人近况。留下最近专注的事、生活的节奏，以及读过和想过的片段。</p><p>这里只展示经核实、适合公开的近况。工作内部细节、财务、健康问题、具体行程和原始聊天不会公开。评论尚未启用。</p><p class="quiet">正文使用霞鹜文楷。未记录与确认的零值会分开呈现。</p></dialog>
+</body>
+</html>

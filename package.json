@@ -1,0 +1,8 @@
+{
+  "name": "slowsail-personal-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {"node": "22.x"},
+  "scripts": {"test": "node --test tests/*.test.mjs", "build": "node scripts/build.mjs", "dev": "node scripts/dev.mjs", "check": "node scripts/check.mjs"}
+}

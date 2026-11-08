@@ -1,0 +1,192 @@
+{
+  "version": "c390e69e1622718d9aec027f7cf05cb5c2b44cb713fceeb6e1e86f6fdaeb152b",
+  "snapshotTotal": 8,
+  "items": [
+    {
+      "id": "pc-b3d63db6badc41a5027f578f",
+      "bookId": "pb-4ffbfa65ee02550622b392f1",
+      "bookTitle": "曾国藩传（张宏杰全新增补版）",
+      "author": "张宏杰",
+      "chapterTitle": "",
+      "topics": [
+        "work_organization",
+        "society_power",
+        "reading_creation"
+      ],
+      "quoteText": "",
+      "thoughtText": "写得当然精彩，看到湘军初战曾国藩自杀的时，更是觉得全如剧本经典套路。不过，后来到网上查询相关资料，才知道什么叫做春秋笔法史官可畏；被修饰过的、带有立场的历史到底有无用处实在令人生疑；若是真全部相信书中所写，全部陷入作者立场之中，甚至按照书中方法指导自己的行为，恐怕做不了圣人，只能做待宰的羔羊。",
+      "sourceUrl": null,
+      "quoteAvailability": "unavailable"
+    },
+    {
+      "id": "pc-9d605c9b675885578303c076",
+      "bookId": "pb-dbda746883660b5c721ef1d3",
+      "bookTitle": "给大壮的信",
+      "author": "苗炜",
+      "chapterTitle": "",
+      "topics": [
+        "reading_creation"
+      ],
+      "quoteText": "",
+      "thoughtText": "序言写的太好，后面的说教便食之无味",
+      "sourceUrl": null,
+      "quoteAvailability": "unavailable"
+    },
+    {
+      "id": "pc-1db04c0f5977d87df9de1fab",
+      "bookId": "pb-9a2139802a907de79a132788",
+      "bookTitle": "夜晚的潜水艇",
+      "author": "陈春成",
+      "chapterTitle": "夜晚的潜水艇",
+      "topics": [
+        "fiction_experience"
+      ],
+      "quoteText": "",
+      "thoughtText": "才华横溢",
+      "sourceUrl": null,
+      "quoteAvailability": "unavailable"
+    },
+    {
+      "id": "pc-2b219a61eb428a9c0082066c",
+      "bookId": "pb-16373e94584e82a86092c49d",
+      "bookTitle": "百年孤独",
+      "author": "[哥]加西亚•马尔克斯",
+      "chapterTitle": "",
+      "topics": [
+        "fiction_experience",
+        "reading_creation"
+      ],
+      "quoteText": "",
+      "thoughtText": "这章很棒。阿玛兰坦的死亡写得很浪漫，梅梅的恋爱很让人有共情感。",
+      "sourceUrl": null,
+      "quoteAvailability": "unavailable"
+    },
+    {
+      "id": "pc-2e3ea96141b3b8c6c390e131",
+      "bookId": "pb-776af78c7fae041267f21e54",
+      "bookTitle": "小花旦",
+      "author": "王占黑",
+      "chapterTitle": "",
+      "topics": [
+        "fiction_experience",
+        "reading_creation"
+      ],
+      "quoteText": "",
+      "thoughtText": "后文渐入佳境，只是现在自己也难有耐心了😂",
+      "sourceUrl": null,
+      "quoteAvailability": "unavailable"
+    },
+    {
+      "id": "pc-757b2caa85f4a77e19a03e92",
+      "bookId": "pb-776af78c7fae041267f21e54",
+      "bookTitle": "小花旦",
+      "author": "王占黑",
+      "chapterTitle": "",
+      "topics": [
+        "fiction_experience",
+        "reading_creation"
+      ],
+      "quoteText": "",
+      "thoughtText": "感觉还是差了点，可能因为之前看过繁花了吧，年轻作家比起金宇澄还是差点",
+      "sourceUrl": null,
+      "quoteAvailability": "unavailable"
+    },
+    {
+      "id": "pc-4e0dacbb2a5055233c57a638",
+      "bookId": "pb-ab6dc17528ab95e962ac78f8",
+      "bookTitle": "基督山伯爵",
+      "author": "[法]大仲马",
+      "chapterTitle": "",
+      "topics": [
+        "fiction_experience",
+        "reading_creation",
+        "ethics_meaning"
+      ],
+      "quoteText": "",
+      "thoughtText": "这章是真牛逼啊，一个武装了智慧与勇气的灵魂是多么强大",
+      "sourceUrl": null,
+      "quoteAvailability": "unavailable"
+    },
+    {
+      "id": "pc-747d57204228fea3d979f26c",
+      "bookId": "pb-9fcfac46768b30031a9af944",
+      "bookTitle": "七声",
+      "author": "葛亮",
+      "chapterTitle": "",
+      "topics": [
+        "reading_creation",
+        "fiction_experience"
+      ],
+      "quoteText": "",
+      "thoughtText": "只读了一篇安，觉得连萌芽都未必要。\n",
+      "sourceUrl": null,
+      "quoteAvailability": "unavailable"
+    }
+  ],
+  "books": [
+    {
+      "bookId": "pb-16373e94584e82a86092c49d",
+      "bookTitle": "百年孤独",
+      "author": "[哥]加西亚•马尔克斯",
+      "count": 1
+    },
+    {
+      "bookId": "pb-4ffbfa65ee02550622b392f1",
+      "bookTitle": "曾国藩传（张宏杰全新增补版）",
+      "author": "张宏杰",
+      "count": 1
+    },
+    {
+      "bookId": "pb-dbda746883660b5c721ef1d3",
+      "bookTitle": "给大壮的信",
+      "author": "苗炜",
+      "count": 1
+    },
+    {
+      "bookId": "pb-9a2139802a907de79a132788",
+      "bookTitle": "夜晚的潜水艇",
+      "author": "陈春成",
+      "count": 1
+    },
+    {
+      "bookId": "pb-776af78c7fae041267f21e54",
+      "bookTitle": "小花旦",
+      "author": "王占黑",
+      "count": 2
+    },
+    {
+      "bookId": "pb-ab6dc17528ab95e962ac78f8",
+      "bookTitle": "基督山伯爵",
+      "author": "[法]大仲马",
+      "count": 1
+    },
+    {
+      "bookId": "pb-9fcfac46768b30031a9af944",
+      "bookTitle": "七声",
+      "author": "葛亮",
+      "count": 1
+    }
+  ],
+  "topics": [
+    {
+      "topic": "fiction_experience",
+      "count": 6
+    },
+    {
+      "topic": "reading_creation",
+      "count": 7
+    },
+    {
+      "topic": "society_power",
+      "count": 1
+    },
+    {
+      "topic": "ethics_meaning",
+      "count": 1
+    },
+    {
+      "topic": "work_organization",
+      "count": 1
+    }
+  ]
+}

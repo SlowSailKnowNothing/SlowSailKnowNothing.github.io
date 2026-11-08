@@ -1,4 +1,0 @@
-User-Agent: *
-Allow: /
-
-Sitemap: https://slowsail.top/sitemap.xml

@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "today": {
+    "schemaVersion": 1,
+    "timezone": "Asia/Shanghai",
+    "updatedAt": "2026-11-08T05:24:39.029Z",
+    "summaryDate": "2026-11-06",
+    "sections": {
+      "projects": {
+        "paragraphs": [
+          "继续通过具体例子学习置信区间、T 检验、评测的可分辨性与最小可检测效应（MDE），并讨论单个评分与版本差值的置信区间有什么区别。"
+        ]
+      },
+      "phone": {
+        "paragraphs": []
+      },
+      "sleep": {
+        "paragraphs": []
+      },
+      "exercise": {
+        "paragraphs": []
+      },
+      "reading": {
+        "paragraphs": []
+      },
+      "thoughts": {
+        "paragraphs": []
+      }
+    },
+    "days": [
+      {
+        "date": "2026-10-23",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": true,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-10-24",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": true,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-10-25",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": null,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-10-29",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": true,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-10-31",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": null,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-11-01",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": null,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-11-02",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": null,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-11-03",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": null,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-11-04",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": null,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-11-05",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": null,
+        "exerciseCompleted": null
+      },
+      {
+        "date": "2026-11-06",
+        "exerciseMinutes": null,
+        "readingMinutes": null,
+        "reviewCompleted": null,
+        "exerciseCompleted": null
+      }
+    ],
+    "archive": [
+      {
+        "date": "2026-10-23",
+        "title": "从工作流下探到具体案例",
+        "paragraphs": [
+          "今天早起工作，主要在调整工作流。下午效率下降，转而研究了一些其他事情。",
+          "后续希望更多地下探到每个 case，检查模型如何处理，并真正阅读代码。"
+        ]
+      },
+      {
+        "date": "2026-10-24",
+        "title": "每日近况",
+        "paragraphs": [
+          "讨论如何利用等待智能体回复时的碎片时间，考虑把这些时间用来验收前面的步骤。",
+          "提出阅读页面加载优化的需求，希望等待时能看到加载反馈。"
+        ]
+      },
+      {
+        "date": "2026-10-25",
+        "title": "每日近况",
+        "paragraphs": [
+          "补充了智能体评测的阅读大纲，围绕评测器准入、可靠性与评测集维护继续提问和讨论。"
+        ]
+      },
+      {
+        "date": "2026-10-29",
+        "title": "每日近况",
+        "paragraphs": [
+          "将完善评测方案列为本周重点，希望尽快把方案写清楚。",
+          "复盘了近期节奏变化，也希望增强写作能力，具体练习方式还在探索。"
+        ]
+      },
+      {
+        "date": "2026-10-31",
+        "title": "每日近况",
+        "paragraphs": [
+          "讨论个人网站的现有架构与更新机制，希望增加仅管理员可用的 Agent 对话窗口，通过对话更新网页内容。"
+        ]
+      },
+      {
+        "date": "2026-11-01",
+        "title": "每日近况",
+        "paragraphs": [
+          "继续讨论个人网站与个人 Agent 的结合，提出通过 API 或 skill 更新网站内容的设想，并寻找可参考的个人 Agent 项目。"
+        ]
+      },
+      {
+        "date": "2026-11-02",
+        "title": "每日近况",
+        "paragraphs": [
+          "思考如何把专业阅读、实践练习与及时反思结合起来，让学习围绕真实问题展开。",
+          "围绕《AI工程师的评测实践》，讨论评测器的可信度、人机判定对齐和问题聚类，询问对应原文说明。"
+        ]
+      },
+      {
+        "date": "2026-11-03",
+        "title": "每日近况",
+        "paragraphs": [
+          "围绕评测相关书籍，讨论 RAG、评测集用途和评测器校准，并提出整理评测术语表的需求。"
+        ]
+      },
+      {
+        "date": "2026-11-04",
+        "title": "每日近况",
+        "paragraphs": [
+          "围绕评测相关书籍，继续讨论评测器验证、校准集更新，以及人工与机器判定的比较方法。"
+        ]
+      },
+      {
+        "date": "2026-11-05",
+        "title": "每日近况",
+        "paragraphs": [
+          "讨论评测集的准入条件、版本比较、差值置信区间与 T 检验。"
+        ]
+      },
+      {
+        "date": "2026-11-06",
+        "title": "每日近况",
+        "paragraphs": [
+          "继续通过具体例子学习置信区间、T 检验、评测的可分辨性与最小可检测效应（MDE），并讨论单个评分与版本差值的置信区间有什么区别。"
+        ]
+      }
+    ]
+  },
+  "reading": {
+    "schemaVersion": 1,
+    "updatedAt": null,
+    "currentBooks": [],
+    "week": null,
+    "entries": []
+  }
+}

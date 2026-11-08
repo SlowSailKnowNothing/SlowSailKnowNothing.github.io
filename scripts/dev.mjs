@@ -1,0 +1,10 @@
+// Local QA only; no fake production login or bypass credentials.
+import {createServer} from 'node:http';import {readFile,stat} from 'node:fs/promises';import path from 'node:path';
+import handler from '../api/index.js';import {readingCards} from '../lib/reading-api.js';
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css','.json':'application/json','.woff2':'font/woff2','.svg':'image/svg+xml','.webp':'image/webp','.txt':'text/plain'};
+createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost');
+ if(url.pathname==='/data/today.json'||url.pathname==='/data/reading.json'){const data=JSON.parse(await readFile('content/public-site.json'));res.setHeader('Content-Type','application/json');res.end(JSON.stringify(url.pathname.includes('today')?data.today:data.reading));return;}
+ if(url.pathname==='/api/reading/cards'){const r=await readingCards(url);res.statusCode=r.status;r.headers.forEach((v,k)=>res.setHeader(k,v));res.end(await r.text());return;}
+ if(url.pathname==='/admin'||url.pathname.startsWith('/api/')){let chunks=[];let length=0;for await(const chunk of req){length+=chunk.length;if(length>1100000){res.statusCode=413;res.end();return;}chunks.push(chunk);}req.body=Buffer.concat(chunks).toString();await handler(req,res);return;}
+ let relative=decodeURIComponent(url.pathname);if(relative==='/')relative='/index.html';if(relative==='/reading'||relative==='/reading/')relative='/reading/index.html';const root=path.resolve('dist'),file=path.resolve(root,'.'+relative);if(!file.startsWith(root+path.sep)){res.statusCode=404;res.end();return;}const data=await readFile(file);res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(data);
+ }catch{res.statusCode=404;res.end('Not found');}}).listen(Number(process.env.PORT||(process.argv.includes('--port')?process.argv[process.argv.indexOf('--port')+1]:3000)),process.argv.includes('--host')?process.argv[process.argv.indexOf('--host')+1]:'127.0.0.1');
